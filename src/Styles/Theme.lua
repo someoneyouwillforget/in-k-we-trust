@@ -1,13 +1,21 @@
 local Theme = {
-    -- The main background color
-    MainBackground = Color3.fromRGB(25, 25, 25),
-    -- The color of buttons and sliders
-    Accent = Color3.fromRGB(0, 162, 255),
-    -- Text colors
-    Text = Color3.fromRGB(255, 255, 255),
-    SecondaryText = Color3.fromRGB(200, 200, 200),
-    -- Corner rounding size
-    CornerRadius = UDim.new(0, 8)
+    -- Background Colors
+    MainBackground = Color3.fromRGB(20, 20, 20),      
+    SecondaryBackground = Color3.fromRGB(25, 25, 25), 
+    
+    -- Accent & Branding
+    Accent = Color3.fromRGB(0, 125, 255),             
+    
+    -- Text Colors
+    Text = Color3.fromRGB(255, 255, 255),             
+    SecondaryText = Color3.fromRGB(180, 180, 180),    
+    
+    -- UI Styling
+    CornerRadius = UDim.new(0, 9),                    
+    StrokeTransparency = 0.8,                         
+    
+    -- Scrolling
+    ScrollBarColor = Color3.fromRGB(40, 40, 40)
 }
 
 return Theme
