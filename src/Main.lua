@@ -1,4 +1,4 @@
-local InKWeTrust = {
+local Internal = {
     Flags = {},
     Theme = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Styles/Theme.lua"))()
 }
@@ -7,109 +7,117 @@ local InKWeTrust = {
 local ToggleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Elements/Toggle.lua"))()
 local ButtonBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Elements/Button.lua"))()
 
-function InKWeTrust:CreateWindow(Settings)
-    local TitleText = Settings.Name or "In K We Trust"
+function Internal:CreateWindow(Settings)
+    local TitleText = Settings.Name or "INTERNAL"
     
     local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
-    ScreenGui.Name = "InKWeTrust_Internal"
+    ScreenGui.Name = "Internal_UI"
 
     -- MAIN WINDOW
     local Main = Instance.new("Frame", ScreenGui)
-    Main.Size = UDim2.new(0, 520, 0, 360)
-    Main.Position = UDim2.new(0.5, -260, 0.5, -180)
-    Main.BackgroundColor3 = Color3.fromRGB(8, 8, 8)
+    Main.Size = UDim2.new(0, 550, 0, 380)
+    Main.Position = UDim2.new(0.5, -275, 0.5, -190)
+    Main.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
     Main.BorderSizePixel = 0
-    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 12)
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
     
+    -- Subtle White Glow/Stroke
     local Stroke = Instance.new("UIStroke", Main)
-    Stroke.Color = InKWeTrust.Theme.Accent
-    Stroke.Thickness = 1.5
+    Stroke.Color = Color3.fromRGB(40, 40, 40)
+    Stroke.Thickness = 1
 
-    -- SIDEBAR NAVIGATION
-    local SideBar = Instance.new("Frame", Main)
-    SideBar.Size = UDim2.new(0, 130, 1, -50)
-    SideBar.Position = UDim2.new(0, 10, 0, 40)
-    SideBar.BackgroundTransparency = 1
+    -- TOP BAR
+    local TopBar = Instance.new("Frame", Main)
+    TopBar.Size = UDim2.new(1, 0, 0, 45)
+    TopBar.BackgroundTransparency = 1
+
+    local Title = Instance.new("TextLabel", TopBar)
+    Title.Size = UDim2.new(1, -100, 1, 0)
+    Title.Position = UDim2.new(0, 15, 0, 0)
+    Title.BackgroundTransparency = 1
+    Title.Text = TitleText
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 13
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- TAB HOLDER (Top Horizontal)
+    local TabHolder = Instance.new("ScrollingFrame", Main)
+    TabHolder.Size = UDim2.new(1, -30, 0, 32)
+    TabHolder.Position = UDim2.new(0, 15, 0, 45)
+    TabHolder.BackgroundTransparency = 1
+    TabHolder.ScrollBarThickness = 0
+    TabHolder.CanvasSize = UDim2.new(0, 0, 0, 0)
     
-    local NavLayout = Instance.new("UIListLayout", SideBar)
-    NavLayout.Padding = UDim.new(0, 6)
-
-    -- TITLE BAR
-    local Header = Instance.new("TextLabel", Main)
-    Header.Size = UDim2.new(1, -20, 0, 35)
-    Header.Position = UDim2.new(0, 15, 0, 0)
-    Header.BackgroundTransparency = 1
-    Header.Text = TitleText:upper()
-    Header.TextColor3 = InKWeTrust.Theme.Text
-    Header.Font = Enum.Font.GothamBold
-    Header.TextSize = 14
-    Header.TextXAlignment = Enum.TextXAlignment.Left
-
-    -- DRAG LINE
-    local DragLine = Instance.new("Frame", Main)
-    DragLine.Size = UDim2.new(0, 60, 0, 2)
-    DragLine.Position = UDim2.new(0.5, -30, 0, 32)
-    DragLine.BackgroundColor3 = InKWeTrust.Theme.Accent
-    DragLine.BorderSizePixel = 0
-    Instance.new("UICorner", DragLine).CornerRadius = UDim.new(1, 0)
+    local TabLayout = Instance.new("UIListLayout", TabHolder)
+    TabLayout.FillDirection = Enum.FillDirection.Horizontal
+    TabLayout.Padding = UDim.new(0, 8)
 
     -- PAGE CONTAINER
     local PageContainer = Instance.new("Frame", Main)
-    PageContainer.Size = UDim2.new(1, -160, 1, -50)
-    PageContainer.Position = UDim2.new(0, 150, 0, 40)
+    PageContainer.Size = UDim2.new(1, -30, 1, -105)
+    PageContainer.Position = UDim2.new(0, 15, 0, 90)
     PageContainer.BackgroundTransparency = 1
 
-    local Window = {Tabs = {}}
+    local Window = {}
 
     function Window:CreateTab(Name)
-        -- Tab Button
-        local TabBtn = Instance.new("TextButton", SideBar)
-        TabBtn.Size = UDim2.new(1, 0, 0, 34)
-        TabBtn.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-        TabBtn.Text = "  " .. Name
-        TabBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
-        TabBtn.Font = Enum.Font.GothamBold
+        -- Tab Pill (White Highlight when active)
+        local TabBtn = Instance.new("TextButton", TabHolder)
+        TabBtn.Size = UDim2.new(0, 100, 1, 0)
+        TabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        TabBtn.Text = Name
+        TabBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+        TabBtn.Font = Enum.Font.GothamMedium
         TabBtn.TextSize = 12
-        TabBtn.TextXAlignment = Enum.TextXAlignment.Left
-        Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 8)
+        Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 20)
 
-        -- Page Frame
         local Page = Instance.new("ScrollingFrame", PageContainer)
         Page.Size = UDim2.new(1, 0, 1, 0)
         Page.BackgroundTransparency = 1
         Page.Visible = false
         Page.ScrollBarThickness = 0
-        
-        local PageLayout = Instance.new("UIListLayout", Page)
-        PageLayout.Padding = UDim.new(0, 8)
+        Instance.new("UIListLayout", Page).Padding = UDim.new(0, 8)
 
         TabBtn.MouseButton1Click:Connect(function()
             for _, v in pairs(PageContainer:GetChildren()) do v.Visible = false end
-            for _, v in pairs(SideBar:GetChildren()) do 
-                if v:IsA("TextButton") then v.TextColor3 = Color3.fromRGB(150, 150, 150) end 
+            for _, v in pairs(TabHolder:GetChildren()) do 
+                if v:IsA("TextButton") then 
+                    v.BackgroundColor3 = Color3.fromRGB(25, 25, 25) 
+                    v.TextColor3 = Color3.fromRGB(180, 180, 180)
+                end 
             end
             Page.Visible = true
-            TabBtn.TextColor3 = InKWeTrust.Theme.Accent
+            TabBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- White Highlight
+            TabBtn.TextColor3 = Color3.fromRGB(0, 0, 0) -- Dark text on white
         end)
 
-        -- First Tab Auto-Selection
-        if #SideBar:GetChildren() == 1 then
+        -- Default Tab Selection
+        if #TabHolder:GetChildren() == 1 then
             Page.Visible = true
-            TabBtn.TextColor3 = InKWeTrust.Theme.Accent
+            TabBtn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            TabBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
         end
 
         local Tab = {}
-        function Tab:CreateButton(text, callback)
-            return ButtonBase.new(Page, text, InKWeTrust.Theme, callback)
-        end
-        function Tab:CreateToggle(text, callback)
-            return ToggleBase.new(Page, text, InKWeTrust.Theme, callback)
-        end
+        function Tab:CreateButton(text, callback) return ButtonBase.new(Page, text, Internal.Theme, callback) end
+        function Tab:CreateToggle(text, callback) return ToggleBase.new(Page, text, Internal.Theme, callback) end
         
+        function Tab:CreateSection(Name)
+            local lbl = Instance.new("TextLabel", Page)
+            lbl.Size = UDim2.new(1, 0, 0, 20)
+            lbl.Text = Name
+            lbl.Font = Enum.Font.GothamBold
+            lbl.TextSize = 10
+            lbl.TextColor3 = Color3.fromRGB(100, 100, 100)
+            lbl.BackgroundTransparency = 1
+            lbl.TextXAlignment = Enum.TextXAlignment.Left
+        end
+
         return Tab
     end
 
     return Window
 end
 
-return InKWeTrust
+return Internal
