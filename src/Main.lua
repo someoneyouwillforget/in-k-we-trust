@@ -1,19 +1,19 @@
 local Library = {}
 
--- 1. FETCHING THE RAW FILES
+-- 1. FETCHING THE FILES
 local Theme = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Styles/Theme.lua"))()
 local ToggleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Elements/Toggle.lua"))()
+local ButtonBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Elements/Button.lua"))()
 
 function Library:CreateWindow(userTitle)
-    -- Dynamic Title Logic
     local titleText = userTitle or "In K We Trust"
     
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = game:GetService("HttpService"):GenerateGUID(false)
-    ScreenGui.IgnoreGuiInset = true
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.IgnoreGuiInset = true
     
-    -- Parent to CoreGui for Universal usage
+    -- Universal Parenting
     local success, err = pcall(function()
         ScreenGui.Parent = game:GetService("CoreGui")
     end)
@@ -30,16 +30,16 @@ function Library:CreateWindow(userTitle)
     MainFrame.Size = UDim2.new(0, 450, 0, 300)
     MainFrame.BorderSizePixel = 0
 
-    -- RAYFIELD STYLE: ROUNDED CORNERS
+    -- ROUNDED CORNERS
     local UICorner = Instance.new("UICorner")
     UICorner.CornerRadius = Theme.CornerRadius or UDim.new(0, 9)
     UICorner.Parent = MainFrame
 
-    -- RAYFIELD STYLE: BORDER STROKE
+    -- BORDER STROKES
     local UIStroke = Instance.new("UIStroke")
     UIStroke.Thickness = 1.2
     UIStroke.Color = Color3.fromRGB(255, 255, 255)
-    UIStroke.Transparency = 0.8
+    UIStroke.Transparency = Theme.StrokeTransparency or 0.8
     UIStroke.Parent = MainFrame
 
     -- TITLE LABEL
@@ -55,7 +55,7 @@ function Library:CreateWindow(userTitle)
     Title.TextSize = 14
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- ELEMENT CONTAINER
+    -- SCROLLING CONTAINER
     local Container = Instance.new("ScrollingFrame")
     Container.Name = "Container"
     Container.Parent = MainFrame
@@ -65,13 +65,19 @@ function Library:CreateWindow(userTitle)
     Container.CanvasSize = UDim2.new(0, 0, 0, 0)
     Container.ScrollBarThickness = 2
     Container.ScrollBarImageColor3 = Theme.Accent
+    Container.BorderSizePixel = 0
     
     local UIListLayout = Instance.new("UIListLayout")
     UIListLayout.Parent = Container
     UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
     UIListLayout.Padding = UDim.new(0, 6)
 
-    -- DRAGGABLE SCRIPT
+    -- AUTO-RESIZE FOR SCROLLING
+    UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        Container.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
+    end)
+
+    -- DRAGGABLE LOGIC
     local UserInputService = game:GetService("UserInputService")
     local dragging, dragInput, dragStart, startPos
 
@@ -96,8 +102,12 @@ function Library:CreateWindow(userTitle)
         end
     end)
 
-    -- API EXPORTS
+    -- API SECTION
     local Window = {}
+
+    function Window:AddButton(text, callback)
+        return ButtonBase.new(Container, text, Theme, callback)
+    end
 
     function Window:AddToggle(text, callback)
         return ToggleBase.new(Container, text, Theme, callback)
