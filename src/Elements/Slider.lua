@@ -1,13 +1,12 @@
-local SliderModule = {}
+local Slider = {}
 
-function SliderModule.new(parent, text, min, max, default, callback)
-    local Slider = Instance.new("Frame", parent)
-    Slider.Name = text .. "Slider"
-    Slider.Size = UDim2.new(1, 0, 0, 45)
-    Slider.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Instance.new("UICorner", Slider).CornerRadius = UDim.new(0, 8)
+function Slider.new(parent, text, min, max, default, callback)
+    local SliderFrame = Instance.new("Frame", parent)
+    SliderFrame.Size = UDim2.new(1, 0, 0, 45)
+    SliderFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+    Instance.new("UICorner", SliderFrame).CornerRadius = UDim.new(0, 8)
     
-    local Title = Instance.new("TextLabel", Slider)
+    local Title = Instance.new("TextLabel", SliderFrame)
     Title.Text = "  " .. text
     Title.Size = UDim2.new(1, 0, 0.5, 0)
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -16,9 +15,9 @@ function SliderModule.new(parent, text, min, max, default, callback)
     Title.TextSize = 12
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    local BarBack = Instance.new("Frame", Slider)
-    BarBack.Size = UDim2.new(1, -20, 0, 4)
-    BarBack.Position = UDim2.new(0, 10, 0.75, -2)
+    local BarBack = Instance.new("Frame", SliderFrame)
+    BarBack.Size = UDim2.new(1, -30, 0, 4)
+    BarBack.Position = UDim2.new(0, 15, 0.75, -2)
     BarBack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     Instance.new("UICorner", BarBack)
 
@@ -27,7 +26,6 @@ function SliderModule.new(parent, text, min, max, default, callback)
     BarMain.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     Instance.new("UICorner", BarMain)
 
-    -- Interaction Nonsense
     local function move(input)
         local pos = math.clamp((input.Position.X - BarBack.AbsolutePosition.X) / BarBack.AbsoluteSize.X, 0, 1)
         BarMain.Size = UDim2.new(pos, 0, 1, 0)
@@ -36,12 +34,10 @@ function SliderModule.new(parent, text, min, max, default, callback)
     end
 
     BarBack.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            move(input)
-        end
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then move(input) end
     end)
-
-    return Slider
+    
+    return SliderFrame
 end
 
-return SliderModule
+return Slider
