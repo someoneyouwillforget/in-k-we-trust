@@ -10,8 +10,8 @@ function Library:CreateWindow(userTitle)
     
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = game:GetService("HttpService"):GenerateGUID(false)
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.IgnoreGuiInset = true
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     
     local success, err = pcall(function()
         ScreenGui.Parent = game:GetService("CoreGui")
@@ -20,92 +20,74 @@ function Library:CreateWindow(userTitle)
         ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     end
 
-    -- MAIN WINDOW
+    -- MAIN WINDOW (Now styled exactly like the elements)
     local MainFrame = Instance.new("Frame", ScreenGui)
-    MainFrame.BackgroundColor3 = Theme.MainBackground
+    MainFrame.BackgroundColor3 = Theme.MainBackground -- Make sure this is dark in Theme.lua
     MainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
     MainFrame.Size = UDim2.new(0, 450, 0, 300)
     MainFrame.BorderSizePixel = 0
     MainFrame.ClipsDescendants = true
 
+    -- ROUNDING (Matches your buttons/toggles)
     local UICorner = Instance.new("UICorner", MainFrame)
     UICorner.CornerRadius = Theme.CornerRadius or UDim.new(0, 9)
 
+    -- THE BORDER (Essential for the "High-End" look)
     local UIStroke = Instance.new("UIStroke", MainFrame)
-    UIStroke.Thickness = 1.2
+    UIStroke.Thickness = 1
     UIStroke.Color = Color3.fromRGB(255, 255, 255)
-    UIStroke.Transparency = 0.8
+    UIStroke.Transparency = 0.9 -- Very subtle outline
+    UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 
-    -- TITLE BAR
+    -- TITLE BAR AREA
     local Title = Instance.new("TextLabel", MainFrame)
     Title.BackgroundTransparency = 1
-    Title.Position = UDim2.new(0, 15, 0, 0)
-    Title.Size = UDim2.new(1, -30, 0, 40)
+    Title.Position = UDim2.new(0, 15, 0, 8)
+    Title.Size = UDim2.new(1, -30, 0, 25)
     Title.Font = Enum.Font.GothamBold
-    Title.Text = titleText
+    Title.Text = titleText:upper() -- Uppercase looks cleaner for titles
     Title.TextColor3 = Theme.Text
-    Title.TextSize = 14
+    Title.TextSize = 12
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- DRAG LINE
+    -- THE DRAG HANDLE LINE (Matching the Tab style)
     local DragLine = Instance.new("Frame", MainFrame)
-    DragLine.Size = UDim2.new(0, 100, 0, 2)
-    DragLine.Position = UDim2.new(0.5, -50, 0, 38)
+    DragLine.Size = UDim2.new(0, 40, 0, 2)
+    DragLine.Position = UDim2.new(0.5, -20, 0, 35)
     DragLine.BackgroundColor3 = Theme.Accent
-    DragLine.BackgroundTransparency = 0.5
     DragLine.BorderSizePixel = 0
     Instance.new("UICorner", DragLine).CornerRadius = UDim.new(1, 0)
 
-    -- CLOSE BUTTON (X)
+    -- WINDOW CONTROLS
     local CloseBtn = Instance.new("TextButton", MainFrame)
-    CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-    CloseBtn.Position = UDim2.new(1, -35, 0, 5)
+    CloseBtn.Size = UDim2.new(0, 20, 0, 20)
+    CloseBtn.Position = UDim2.new(1, -30, 0, 10)
     CloseBtn.BackgroundTransparency = 1
-    CloseBtn.Text = "×"
-    CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
-    CloseBtn.TextSize = 20
+    CloseBtn.Text = "✕"
+    CloseBtn.TextColor3 = Theme.Text
+    CloseBtn.TextSize = 14
     CloseBtn.Font = Enum.Font.GothamBold
 
-    CloseBtn.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
+    CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
-    -- MINIMIZE BUTTON (-)
-    local MinBtn = Instance.new("TextButton", MainFrame)
-    MinBtn.Size = UDim2.new(0, 30, 0, 30)
-    MinBtn.Position = UDim2.new(1, -65, 0, 5)
-    MinBtn.BackgroundTransparency = 1
-    MinBtn.Text = "−"
-    MinBtn.TextColor3 = Theme.Text
-    MinBtn.TextSize = 20
-    MinBtn.Font = Enum.Font.GothamBold
-
-    local minimized = false
-    MinBtn.MouseButton1Click:Connect(function()
-        minimized = not minimized
-        local targetSize = minimized and UDim2.new(0, 450, 0, 40) or UDim2.new(0, 450, 0, 300)
-        game:GetService("TweenService"):Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {Size = targetSize}):Play()
-    end)
-
-    -- CONTAINER
+    -- CONTAINER (With Padding so elements don't touch the edges)
     local Container = Instance.new("ScrollingFrame", MainFrame)
     Container.Name = "Container"
     Container.BackgroundTransparency = 1
     Container.Position = UDim2.new(0, 10, 0, 50)
     Container.Size = UDim2.new(1, -20, 1, -60)
     Container.CanvasSize = UDim2.new(0, 0, 0, 0)
-    Container.ScrollBarThickness = 2
-    Container.BorderSizePixel = 0
+    Container.ScrollBarThickness = 0 -- Hide scrollbar for a cleaner look
     
     local UIListLayout = Instance.new("UIListLayout", Container)
     UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    UIListLayout.Padding = UDim.new(0, 6)
+    UIListLayout.Padding = UDim.new(0, 8) -- Space between elements
 
     UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         Container.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
     end)
 
-    -- DRAGGING NONSENSE
+    -- DRAGGING LOGIC
     local UserInputService = game:GetService("UserInputService")
     local dragging, dragInput, dragStart, startPos
 
