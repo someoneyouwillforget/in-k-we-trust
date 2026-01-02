@@ -1,0 +1,31 @@
+local Library = {}
+Library.Theme = {
+    MainColor = Color3.fromRGB(30, 30, 30),
+    AccentColor = Color3.fromRGB(0, 150, 255),
+    TextColor = Color3.fromRGB(255, 255, 255)
+}
+
+function Library:CreateWindow(title)
+    local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+    
+    local MainFrame = Instance.new("Frame", ScreenGui)
+    MainFrame.Size = UDim2.new(0, 400, 0, 300)
+    MainFrame.BackgroundColor3 = Library.Theme.MainColor
+    
+    local Title = Instance.new("TextLabel", MainFrame)
+    Title.Text = title
+    Title.Size = UDim2.new(1, 0, 0, 30)
+    
+    -- Tab for Buttons
+    local Container = Instance.new("ScrollingFrame", MainFrame)
+    Container.Size = UDim2.new(1, -20, 1, -40)
+    Container.Position = UDim2.new(0, 10, 0, 35)
+    
+    return {
+        -- Where you link the button code
+        AddButton = function(self, text, callback)
+        end
+    }
+end
+
+return Library
