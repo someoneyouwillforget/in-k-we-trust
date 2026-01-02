@@ -1,87 +1,80 @@
-local Library = {}
+local Library = {
+    Flags = {},
+    Theme = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Styles/Theme.lua"))()
+}
 
--- FETCH MODULES
-local Theme = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Styles/Theme.lua"))()
+-- Fetch Element Modules
 local ToggleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Elements/Toggle.lua"))()
 local ButtonBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Elements/Button.lua"))()
 
-function Library:CreateWindow(userTitle)
-    local titleText = userTitle or "In K We Trust"
-    local MAIN_COLOR = Theme.Accent or Color3.fromHex("ffffff")
-
-    local ScreenGui = Instance.new("ScreenGui")
+function Library:CreateWindow(Settings)
+    local Title = Settings.Name or "In K We Trust"
+    
+    local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
     ScreenGui.Name = "In_K_We_Trust"
-    ScreenGui.IgnoreGuiInset = true
+
+    -- MAIN HUB
+    local Main = Instance.new("Frame", ScreenGui)
+    Main.Size = UDim2.new(0, 500, 0, 350)
+    Main.Position = UDim2.new(0.5, -250, 0.5, -175)
+    Main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 9)
     
-    local success, err = pcall(function()
-        ScreenGui.Parent = game:GetService("CoreGui")
-    end)
-    if not success then
-        ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-    end
+    local Stroke = Instance.new("UIStroke", Main)
+    Stroke.Color = Library.Theme.Accent
+    Stroke.Thickness = 1.2
 
-    -- MAIN FRAME
-    local MainFrame = Instance.new("Frame", ScreenGui)
-    MainFrame.Size = UDim2.new(0, 480, 0, 350)
-    MainFrame.Position = UDim2.new(0.5, -240, 0.5, -175)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
-    MainFrame.BorderSizePixel = 0
+    -- SIDEBAR (Navigation)
+    local SideBar = Instance.new("Frame", Main)
+    SideBar.Size = UDim2.new(0, 120, 1, -40)
+    SideBar.Position = UDim2.new(0, 10, 0, 30)
+    SideBar.BackgroundTransparency = 1
     
-    local MainCorner = Instance.new("UICorner", MainFrame)
-    MainCorner.CornerRadius = UDim.new(0, 20)
+    local NavLayout = Instance.new("UIListLayout", SideBar)
+    NavLayout.Padding = UDim.new(0, 5)
 
-    local MainStroke = Instance.new("UIStroke", MainFrame)
-    MainStroke.Color = MAIN_COLOR
-    MainStroke.Thickness = 1.5
+    -- CONTAINER
+    local PageContainer = Instance.new("Frame", Main)
+    PageContainer.Size = UDim2.new(1, -150, 1, -50)
+    PageContainer.Position = UDim2.new(0, 140, 0, 40)
+    PageContainer.BackgroundTransparency = 1
 
-    -- HEADER
-    local Header = Instance.new("Frame", MainFrame)
-    Header.Size = UDim2.new(0.94, 0, 0, 40)
-    Header.Position = UDim2.new(0.03, 0, 0.04, 0)
-    Header.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
-    
-    local HeaderCorner = Instance.new("UICorner", Header)
-    HeaderCorner.CornerRadius = UDim.new(0, 12)
+    local Window = {CurrentPage = nil}
 
-    local Title = Instance.new("TextLabel", Header)
-    Title.Text = "  " .. titleText
-    Title.Size = UDim2.new(0.5, 0, 1, 0)
-    Title.BackgroundTransparency = 1
-    Title.TextColor3 = Color3.new(1, 1, 1)
-    Title.Font = Enum.Font.GothamBold
-    Title.TextSize = 20
-    Title.TextXAlignment = Enum.TextXAlignment.Left
+    function Window:CreateTab(Name)
+        local TabBtn = Instance.new("TextButton", SideBar)
+        TabBtn.Size = UDim2.new(1, 0, 0, 30)
+        TabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        TabBtn.Text = Name
+        TabBtn.TextColor3 = Color3.new(1, 1, 1)
+        TabBtn.Font = Enum.Font.Gotham
+        TabBtn.TextSize = 12
+        Instance.new("UICorner", TabBtn).CornerRadius = UDim.new(0, 6)
 
-    -- CLOSE BUTTON
-    local CloseBtn = Instance.new("TextButton", Header)
-    CloseBtn.Size = UDim2.new(0, 28, 0, 28)
-    CloseBtn.Position = UDim2.new(0.92, 0, 0.5, -14)
-    CloseBtn.BackgroundColor3 = Color3.fromRGB(40, 10, 15)
-    CloseBtn.Text = "×"
-    CloseBtn.TextColor3 = Color3.new(1, 1, 1)
-    CloseBtn.Font = Enum.Font.GothamBold
-    Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
-    CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+        local Page = Instance.new("ScrollingFrame", PageContainer)
+        Page.Size = UDim2.new(1, 0, 1, 0)
+        Page.BackgroundTransparency = 1
+        Page.Visible = false
+        Page.ScrollBarThickness = 0
+        
+        local PageLayout = Instance.new("UIListLayout", Page)
+        PageLayout.Padding = UDim.new(0, 8)
 
-    -- CONTENT CONTAINER
-    local Container = Instance.new("ScrollingFrame", MainFrame)
-    Container.Name = "UIContent"
-    Container.Position = UDim2.new(0.03, 0, 0.2, 0)
-    Container.Size = UDim2.new(0.94, 0, 0.75, 0)
-    Container.BackgroundTransparency = 1
-    Container.ScrollBarThickness = 0
-    
-    local Layout = Instance.new("UIListLayout", Container)
-    Layout.Padding = UDim.new(0, 10)
-    Layout.SortOrder = Enum.SortOrder.LayoutOrder
+        TabBtn.MouseButton1Click:Connect(function()
+            for _, v in pairs(PageContainer:GetChildren()) do v.Visible = false end
+            Page.Visible = true
+        end)
 
-    -- API EXPORTS
-    local Window = {}
-    function Window:AddButton(text, callback)
-        return ButtonBase.new(Container, text, Theme, callback)
-    end
-    function Window:AddToggle(text, callback)
-        return ToggleBase.new(Container, text, Theme, callback)
+        -- Page API
+        local Tab = {}
+        function Tab:CreateButton(text, callback)
+            return ButtonBase.new(Page, text, Library.Theme, callback)
+        end
+        function Tab:CreateToggle(text, callback)
+            return ToggleBase.new(Page, text, Library.Theme, callback)
+        end
+        
+        return Tab
     end
 
     return Window
