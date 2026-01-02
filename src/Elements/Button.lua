@@ -1,38 +1,21 @@
-local ButtonModule = {}
+local Button = {}
 
-function ButtonModule.new(parent, text, theme, callback)
-    local Button = Instance.new("TextButton")
-    Button.Name = text .. "Button"
-    Button.Parent = parent
-    Button.Size = UDim2.new(1, 0, 0, 38)
-    Button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Button.AutoButtonColor = false
-    Button.Text = "  " .. text
-    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.Font = Enum.Font.Gotham
-    Button.TextSize = 13
-    Button.TextXAlignment = Enum.TextXAlignment.Left
+function Button.new(parent, text, callback)
+    local Btn = Instance.new("TextButton", parent)
+    Btn.Size = UDim2.new(1, 0, 0, 40)
+    Btn.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+    Btn.Text = "  " .. text
+    Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Btn.Font = Enum.Font.Gotham
+    Btn.TextSize = 13
+    Btn.TextXAlignment = Enum.TextXAlignment.Left
+    
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 8)
+    local Stroke = Instance.new("UIStroke", Btn)
+    Stroke.Color = Color3.fromRGB(40, 40, 40)
 
-    local UICorner = Instance.new("UICorner", Button)
-    UICorner.CornerRadius = UDim.new(0, 8)
-
-    local UIStroke = Instance.new("UIStroke", Button)
-    UIStroke.Color = Color3.fromRGB(40, 40, 40)
-    UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-    -- Minimalist Click Animation
-    Button.MouseButton1Down:Connect(function()
-        UIStroke.Color = Color3.fromRGB(255, 255, 255)
-        game:GetService("TweenService"):Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(30, 30, 30)}):Play()
-    end)
-
-    Button.MouseButton1Up:Connect(function()
-        UIStroke.Color = Color3.fromRGB(40, 40, 40)
-        game:GetService("TweenService"):Create(Button, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(20, 20, 20)}):Play()
-        callback()
-    end)
-
-    return Button
+    Btn.MouseButton1Click:Connect(callback)
+    return Btn
 end
 
-return ButtonModule
+return Button
