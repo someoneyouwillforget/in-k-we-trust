@@ -11,7 +11,7 @@ local Theme = {
     SecondaryText = Color3.fromRGB(180, 180, 180),    
     
     -- UI Styling
-    CornerRadius = UDim.new(0, 9),                    
+    CornerRadius = UDim.new(0, 7),                    
     StrokeTransparency = 0.8,                         
     
     -- Scrolling
