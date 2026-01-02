@@ -1,6 +1,6 @@
 local Library = {}
 
--- 1. FETCHING THE FILES
+-- FETCHING RAW FILES
 local Theme = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Styles/Theme.lua"))()
 local ToggleBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Elements/Toggle.lua"))()
 local ButtonBase = loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouwillforget/in-k-we-trust/refs/heads/main/src/Elements/Button.lua"))()
@@ -13,7 +13,6 @@ function Library:CreateWindow(userTitle)
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     ScreenGui.IgnoreGuiInset = true
     
-    -- Universal Parenting
     local success, err = pcall(function()
         ScreenGui.Parent = game:GetService("CoreGui")
     end)
@@ -21,31 +20,24 @@ function Library:CreateWindow(userTitle)
         ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     end
 
-    -- MAIN WINDOW FRAME
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Name = "MainFrame"
-    MainFrame.Parent = ScreenGui
+    -- MAIN WINDOW
+    local MainFrame = Instance.new("Frame", ScreenGui)
     MainFrame.BackgroundColor3 = Theme.MainBackground
     MainFrame.Position = UDim2.new(0.5, -225, 0.5, -150)
     MainFrame.Size = UDim2.new(0, 450, 0, 300)
     MainFrame.BorderSizePixel = 0
+    MainFrame.ClipsDescendants = true
 
-    -- ROUNDED CORNERS
-    local UICorner = Instance.new("UICorner")
+    local UICorner = Instance.new("UICorner", MainFrame)
     UICorner.CornerRadius = Theme.CornerRadius or UDim.new(0, 9)
-    UICorner.Parent = MainFrame
 
-    -- BORDER STROKES
-    local UIStroke = Instance.new("UIStroke")
+    local UIStroke = Instance.new("UIStroke", MainFrame)
     UIStroke.Thickness = 1.2
     UIStroke.Color = Color3.fromRGB(255, 255, 255)
-    UIStroke.Transparency = Theme.StrokeTransparency or 0.8
-    UIStroke.Parent = MainFrame
+    UIStroke.Transparency = 0.8
 
-    -- TITLE LABEL
-    local Title = Instance.new("TextLabel")
-    Title.Name = "Title"
-    Title.Parent = MainFrame
+    -- TITLE BAR
+    local Title = Instance.new("TextLabel", MainFrame)
     Title.BackgroundTransparency = 1
     Title.Position = UDim2.new(0, 15, 0, 0)
     Title.Size = UDim2.new(1, -30, 0, 40)
@@ -55,29 +47,65 @@ function Library:CreateWindow(userTitle)
     Title.TextSize = 14
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- SCROLLING CONTAINER
-    local Container = Instance.new("ScrollingFrame")
+    -- DRAG LINE
+    local DragLine = Instance.new("Frame", MainFrame)
+    DragLine.Size = UDim2.new(0, 100, 0, 2)
+    DragLine.Position = UDim2.new(0.5, -50, 0, 38)
+    DragLine.BackgroundColor3 = Theme.Accent
+    DragLine.BackgroundTransparency = 0.5
+    DragLine.BorderSizePixel = 0
+    Instance.new("UICorner", DragLine).CornerRadius = UDim.new(1, 0)
+
+    -- CLOSE BUTTON (X)
+    local CloseBtn = Instance.new("TextButton", MainFrame)
+    CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+    CloseBtn.Position = UDim2.new(1, -35, 0, 5)
+    CloseBtn.BackgroundTransparency = 1
+    CloseBtn.Text = "×"
+    CloseBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+    CloseBtn.TextSize = 20
+    CloseBtn.Font = Enum.Font.GothamBold
+
+    CloseBtn.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    -- MINIMIZE BUTTON (-)
+    local MinBtn = Instance.new("TextButton", MainFrame)
+    MinBtn.Size = UDim2.new(0, 30, 0, 30)
+    MinBtn.Position = UDim2.new(1, -65, 0, 5)
+    MinBtn.BackgroundTransparency = 1
+    MinBtn.Text = "−"
+    MinBtn.TextColor3 = Theme.Text
+    MinBtn.TextSize = 20
+    MinBtn.Font = Enum.Font.GothamBold
+
+    local minimized = false
+    MinBtn.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        local targetSize = minimized and UDim2.new(0, 450, 0, 40) or UDim2.new(0, 450, 0, 300)
+        game:GetService("TweenService"):Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {Size = targetSize}):Play()
+    end)
+
+    -- CONTAINER
+    local Container = Instance.new("ScrollingFrame", MainFrame)
     Container.Name = "Container"
-    Container.Parent = MainFrame
     Container.BackgroundTransparency = 1
-    Container.Position = UDim2.new(0, 10, 0, 45)
-    Container.Size = UDim2.new(1, -20, 1, -55)
+    Container.Position = UDim2.new(0, 10, 0, 50)
+    Container.Size = UDim2.new(1, -20, 1, -60)
     Container.CanvasSize = UDim2.new(0, 0, 0, 0)
     Container.ScrollBarThickness = 2
-    Container.ScrollBarImageColor3 = Theme.Accent
     Container.BorderSizePixel = 0
     
-    local UIListLayout = Instance.new("UIListLayout")
-    UIListLayout.Parent = Container
+    local UIListLayout = Instance.new("UIListLayout", Container)
     UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
     UIListLayout.Padding = UDim.new(0, 6)
 
-    -- AUTO-RESIZE FOR SCROLLING
     UIListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
         Container.CanvasSize = UDim2.new(0, 0, 0, UIListLayout.AbsoluteContentSize.Y)
     end)
 
-    -- DRAGGABLE LOGIC
+    -- DRAGGING NONSENSE
     local UserInputService = game:GetService("UserInputService")
     local dragging, dragInput, dragStart, startPos
 
@@ -102,17 +130,9 @@ function Library:CreateWindow(userTitle)
         end
     end)
 
-    -- API SECTION
     local Window = {}
-
-    function Window:AddButton(text, callback)
-        return ButtonBase.new(Container, text, Theme, callback)
-    end
-
-    function Window:AddToggle(text, callback)
-        return ToggleBase.new(Container, text, Theme, callback)
-    end
-
+    function Window:AddButton(text, callback) return ButtonBase.new(Container, text, Theme, callback) end
+    function Window:AddToggle(text, callback) return ToggleBase.new(Container, text, Theme, callback) end
     return Window
 end
 
